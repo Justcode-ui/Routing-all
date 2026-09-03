@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ROUTINGALL local developer proxy settings — manage your Master Key and provider API keys.">
+  <title>ROUTINGALL Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="window">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="mark">
+          <svg width="16" height="16" viewBox="0 0 24 24">
+            <path fill="none" stroke="#E7E9EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              d="M6 4 L6 20 M6 4 L15 4 Q15 4 15 7.5 Q15 11 6 11 M10 11 L17 20"/>
+            <circle fill="#FF7A33" cx="6" cy="4" r="1.6"/>
+            <circle fill="#FF7A33" cx="15" cy="7.5" r="1.6"/>
+            <circle fill="#FF7A33" cx="17" cy="20" r="1.6"/>
+          </svg>
+        </div>
+        <div class="brand-name">ROUTINGALL</div>
+      </div>
+      <div class="status-pill" id="statusPill">
+        <div class="pulse"></div>
+        <span class="label" id="statusLabel">LISTENING</span>
+      </div>
+    </div>
+    <div class="conflict-banner hidden" id="conflictBanner">
+      <div class="conflict-icon">⚠</div>
+      <div class="conflict-text" id="conflictText">Port 8081 is in use by another application. Please close the conflicting app to enable local proxying.</div>
+    </div>
+    <div class="endpoint-row">
+      <code id="endpointUrl">127.0.0.1:8081/v1</code>
+      <button class="copy-btn" id="copyEndpointBtn">COPY</button>
+    </div>
+  </div>
+
+  <!-- ── Scrollable content ── -->
+  <div class="main-content">
+
+    <!-- Master Key -->
+    <div class="section">
+      <div class="section-title">
+        <span>Master Key</span>
+        <span id="copyKeyHint" style="color:var(--text-dim); text-transform:none; font-size:10px; transition:color 0.2s;">Click key or icon to copy</span>
+      </div>
+      <div class="masterkey-row">
+        <div class="key-field" id="masterKeyDisplay" title="Click to copy full Master Key">rg-master-key-••••••7f2a</div>
+        <button class="icon-btn" id="copyMasterKeyBtn" title="Copy Master Key">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+        <button class="icon-btn" id="toggleMasterKeyBtn" title="Show/hide Master Key">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+        <button class="icon-btn" id="regenMasterKeyBtn" title="Regenerate key">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Providers -->
+    <div class="section">
+      <div class="section-title">
+        <span>Providers</span>
+        <span id="providerCount" style="color:var(--text-dim); text-transform:none; font-size:10px;">0 of 3</span>
+      </div>
+
+      <!-- Groq -->
+      <div class="provider">
+        <div class="provider-info">
+          <div class="provider-name">
+            <span class="status-dot off" id="dotGroq"></span>
+            <span>Groq</span>
+            <span class="rl-badge hidden" id="rlBadgeGroq"></span>
+          </div>
+          <div class="provider-sub" id="subGroq">Not configured</div>
+        </div>
+        <button class="edit-icon-btn" id="editGroqBtn" title="Edit Groq key">+</button>
+      </div>
+
+      <!-- Google AI Studio (Gemini) -->
+      <div class="provider">
+        <div class="provider-info">
+          <div class="provider-name">
+            <span class="status-dot off" id="dotGemini"></span>
+            <span>Google AI Studio</span>
+            <span class="rl-badge hidden" id="rlBadgeGemini"></span>
+          </div>
+          <div class="provider-sub" id="subGemini">Not configured</div>
+        </div>
+        <button class="edit-icon-btn" id="editGeminiBtn" title="Edit Gemini key">+</button>
+      </div>
+
+      <!-- OpenRouter -->
+      <div class="provider">
+        <div class="provider-info">
+          <div class="provider-name">
+            <span class="status-dot off" id="dotOpenRouter"></span>
+            <span>OpenRouter</span>
+            <span class="rl-badge hidden" id="rlBadgeOpenRouter"></span>
+          </div>
+          <div class="provider-sub" id="subOpenRouter">Not configured</div>
+        </div>
+        <button class="edit-icon-btn" id="editOpenRouterBtn" title="Edit OpenRouter key">+</button>
+      </div>
+    </div>
+
+    <!-- Request Activity (FR-8) -->
+    <div class="section" id="activitySection">
+      <div class="section-title"><span>Activity</span><span id="activityMeta">this session</span></div>
+      <div class="activity-chart" id="activityChart">
+        <!-- 3 bar rows, one per provider, rendered by JS -->
+      </div>
+      <div class="activity-disclaimer">Session only — resets on restart. Reflects requests through ROUTINGALL, not your provider's actual quota. Check your provider's dashboard for real limits.</div>
+    </div>
+
+    <!-- Code Snippet Viewer (FR-7) -->
+    <div class="section">
+      <div class="section-title"><span>Code</span></div>
+      <div class="snippet-tabs">
+        <div class="snippet-tab active" data-tab="python">Python</div>
+        <div class="snippet-tab" data-tab="node">Node.js</div>
+        <div class="snippet-tab" data-tab="curl">cURL</div>
+      </div>
+      <div class="snippet-block">
+        <button class="snippet-copy" id="copySnippetBtn">COPY</button>
+        <code id="snippetCode"></code>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div class="footer-meta">
+      <span id="portDisplay">Port 8081</span>
+      <span class="sep">·</span>
+      <span id="keychainDisplay">Keychain OK</span>
+    </div>
+    <div class="quit-link" id="quitBtn">Quit</div>
+  </div>
+
+</div><!-- end window -->
+
+
+<!-- ══ Modal: Provider Key Edit ══ -->
+<div class="modal-overlay hidden" id="editKeyModal">
+  <div class="modal">
+    <div class="modal-body">
+      <h3 id="modalProviderTitle">Add Provider Key</h3>
+      <p id="modalProviderHelp">Paste your API key below. Stored securely in your OS keychain.</p>
+      <input type="password" class="modal-input" id="modalKeyInput" placeholder="gsk_..." autocomplete="off"/>
+      <div id="keyFormatWarning" style="font-family:var(--mono);font-size:10px;color:var(--warn);min-height:14px;margin-bottom:10px;"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelKeyModalBtn">Cancel</button>
+        <button class="btn-signal" id="saveKeyModalBtn">Save Key</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal: Regenerate Master Key ══ -->
+<div class="modal-overlay hidden" id="regenModal">
+  <div class="modal">
+    <div class="modal-body">
+      <div class="modal-icon warn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+      </div>
+      <h3>Regenerate Master Key?</h3>
+      <p>The current key will stop working immediately. Update it in every project that uses ROUTINGALL before any code will work again.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelRegenBtn">Cancel</button>
+        <button class="btn-warn" id="confirmRegenBtn">Regenerate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal: Reset & Remove All Keys ══ -->
+<div class="modal-overlay hidden" id="resetModal">
+  <div class="modal">
+    <div class="modal-body">
+      <div class="modal-icon err">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+      </div>
+      <h3>Remove all keys?</h3>
+      <p>This deletes every provider key from your OS keychain and invalidates your Master Key immediately. Any project using the old key will start failing. This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelResetBtn">Cancel</button>
+        <button class="btn-danger" id="confirmResetBtn">Remove All Keys</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
